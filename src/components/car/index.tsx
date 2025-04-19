@@ -1,11 +1,11 @@
 import { useRef } from "react";
-import { Mesh } from "three";
+import { Group } from "three";
 import { useFrame } from "@react-three/fiber";
 
 import useControls from "@/hooks/useControls";
 
 function Car() {
-  const carRef = useRef<Mesh>(null);
+  const carRef = useRef<Group>(null);
   const controls = useControls();
 
   useFrame(() => {

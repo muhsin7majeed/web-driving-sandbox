@@ -2,6 +2,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
 import Car from "@/components/car";
+import AiCar from "@/components/AiCar";
 import Ground from "@/components/ground";
 
 const GameWorld = () => {
@@ -13,6 +14,7 @@ const GameWorld = () => {
       <directionalLight position={[10, 10, 5]} castShadow />
 
       <Car />
+      <AiCar />
       <Ground />
 
       <OrbitControls />
