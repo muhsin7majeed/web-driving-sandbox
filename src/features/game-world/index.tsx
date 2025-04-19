@@ -1,8 +1,8 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 
-import Car from "@/features/car";
-import Ground from "@/features/ground";
+import Car from "@/components/car";
+import Ground from "@/components/ground";
 
 const GameWorld = () => {
   return (
