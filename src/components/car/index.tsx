@@ -1,92 +1,128 @@
 import { useRef } from "react";
-import { Group } from "three";
 import { useFrame } from "@react-three/fiber";
 
 import useControls from "@/hooks/useControls";
 import clamp from "@/utils/common";
-import getCarConstants from "@/utils/getCarConstants";
+import { RigidBody, RapierRigidBody } from "@react-three/rapier";
+import useCarTuning from "@/hooks/useCarTuning";
 
 function Car() {
-  const carRef = useRef<Group>(null);
+  const rigidBodyRef = useRef<RapierRigidBody>(null);
   const controls = useControls();
-
-  const { maxSpeed, maxReverseSpeed, acceleration, friction, turnSpeed, reverseTurnSpeed } = getCarConstants({
-    topSpeed: 0.5
-  });
-
   const currentSpeed = useRef(0);
+  const { topSpeed, acceleration, friction, turnSpeed } = useCarTuning();
+
+  const maxReverseSpeed = topSpeed * 0.5;
 
   useFrame(() => {
-    if (!carRef.current) return;
+    if (!rigidBodyRef.current) return;
 
-    // Get current rotation - where the car is facing to
-    const rotationY = carRef.current.rotation.y;
+    const rigidBody = rigidBodyRef.current;
+    const rotation = rigidBody.rotation();
+    const rotationY = rotation.y;
+
     const speed = currentSpeed.current;
-    const speedRatio = Math.abs(speed) / maxSpeed;
+    const speedRatio = Math.abs(speed) / topSpeed;
     const dynamicAcceleration = acceleration * (1 - speedRatio);
 
-    const updateSpeed = () => {
-      if (controls.forward) {
-        // Accelerate forward
-        currentSpeed.current = clamp(speed - dynamicAcceleration, -maxSpeed, maxReverseSpeed);
-      } else if (controls.backward) {
-        // Accelerate backward
-        currentSpeed.current = clamp(speed + dynamicAcceleration, -maxSpeed, maxReverseSpeed);
-      } else {
-        // Apply friction when idle
-        if (speed < 0) {
-          currentSpeed.current = Math.min(speed + friction, 0);
-        } else if (speed > 0) {
-          currentSpeed.current = Math.max(speed - friction, 0);
+    const goForward = () => {
+      currentSpeed.current = clamp(currentSpeed.current - dynamicAcceleration, -topSpeed, maxReverseSpeed);
+    };
+
+    const goBackward = () => {
+      currentSpeed.current = clamp(currentSpeed.current + dynamicAcceleration, -topSpeed, maxReverseSpeed);
+    };
+
+    const applyFriction = () => {
+      if (currentSpeed.current < 0) {
+        currentSpeed.current = Math.min(currentSpeed.current + friction, 0);
+      } else if (currentSpeed.current > 0) {
+        currentSpeed.current = Math.max(currentSpeed.current - friction, 0);
+      }
+    };
+
+    const handleTurn = () => {
+      let steeringAngle = 0;
+
+      if (controls.left) steeringAngle += 0.02;
+      if (controls.right) steeringAngle -= 0.02;
+
+      const isMoving = Math.abs(currentSpeed.current) > 0.01;
+
+      if (isMoving) {
+        if (controls.left) steeringAngle += turnSpeed;
+        if (controls.right) steeringAngle -= turnSpeed;
+
+        let skidFactor = 1;
+
+        if (Math.abs(currentSpeed.current) > topSpeed * 0.7) {
+          skidFactor = 0.3; // very little turning ability
         }
+
+        // Apply rotation
+        rigidBody.setRotation(
+          {
+            x: 0,
+            y: rotationY + steeringAngle * turnSpeed * skidFactor,
+            z: 0,
+            w: 1
+          },
+          true
+        );
       }
     };
 
-    const updateRotation = () => {
-      const speed = currentSpeed.current;
-      if (speed === 0) return;
+    const handleMovement = () => {
+      const forwardDir = {
+        x: Math.sin(rotationY),
+        y: 0,
+        z: Math.cos(rotationY)
+      };
 
-      const direction = speed < 0 ? "forward" : "backward";
-      const rotation = carRef.current!.rotation;
+      const velocity = {
+        x: forwardDir.x * currentSpeed.current,
+        y: 0,
+        z: forwardDir.z * currentSpeed.current
+      };
 
-      if (direction === "forward") {
-        if (controls.left) rotation.y += turnSpeed;
-        if (controls.right) rotation.y -= turnSpeed;
-      } else {
-        if (controls.left) rotation.y -= reverseTurnSpeed;
-        if (controls.right) rotation.y += reverseTurnSpeed;
-      }
+      rigidBody.setLinvel(velocity, true);
     };
 
-    const updatePosition = () => {
-      const speed = currentSpeed.current;
+    if (controls.forward) {
+      goForward();
+    } else if (controls.backward) {
+      goBackward();
+    } else {
+      applyFriction();
+    }
 
-      // Calculate the movement vector based on rotation
-      // Basically: if the car is rotated 90 degrees, move sideways instead of forward
-      const dx = Math.sin(rotationY) * speed;
-      const dz = Math.cos(rotationY) * speed;
-
-      carRef.current!.position.x += dx;
-      carRef.current!.position.z += dz;
-    };
-
-    updateSpeed();
-    updateRotation();
-    updatePosition();
+    handleTurn();
+    handleMovement();
   });
 
   return (
-    <group ref={carRef} position={[0, 0.5, 0]}>
-      <mesh castShadow>
-        <boxGeometry args={[1, 1, 3]} />
-        <meshStandardMaterial color="hotpink" />
-      </mesh>
+    <RigidBody
+      ref={rigidBodyRef}
+      colliders={"cuboid"}
+      mass={1}
+      friction={2}
+      restitution={0.1}
+      linearDamping={1.5}
+      angularDamping={1.5}
+      enabledRotations={[false, true, false]}
+    >
+      <group position={[0, 0.5, 0]}>
+        <mesh castShadow>
+          <boxGeometry args={[1, 1, 3]} />
+          <meshStandardMaterial color="hotpink" />
+        </mesh>
 
-      <mesh castShadow position={[0, 1, 0.5]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="gray" />
-      </mesh>
-    </group>
+        <mesh castShadow position={[0, 1, 0.5]}>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color="gray" />
+        </mesh>
+      </group>
+    </RigidBody>
   );
 }
 
