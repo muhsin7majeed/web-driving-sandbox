@@ -1,11 +1,11 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { Mesh, Quaternion, Vector3 } from "three";
 
 import useControls from "@/hooks/useControls";
 import clamp from "@/utils/common";
 import { RigidBody, RapierRigidBody } from "@react-three/rapier";
 import useCarTuning from "@/hooks/useCarTuning";
-import { Quaternion, Vector3 } from "three";
 
 function Car() {
   const rigidBodyRef = useRef<RapierRigidBody>(null);
@@ -13,10 +13,12 @@ function Car() {
   const currentSpeed = useRef(0);
   const steeringAngleRef = useRef(0);
   const headingRef = useRef(0);
+  const frontLeftWheelRef = useRef<Mesh>(null);
+  const frontRightWheelRef = useRef<Mesh>(null);
   const { topSpeed, acceleration, friction } = useCarTuning();
 
   const maxReverseSpeed = topSpeed * 0.5;
-  const maxSteeringAngle = Math.PI / 6; // ~30 degrees
+  const maxSteeringAngle = Math.PI / 120;
   const wheelbase = 4; // meters
   const steeringSpeed = 0.001;
 
@@ -78,7 +80,7 @@ function Car() {
 
     // Get current velocity to preserve y component (gravity)
     const currentVel = rigidBody.linvel();
-    
+
     const velocity = {
       x: Math.sin(heading) * speed,
       y: currentVel.y, // Preserve vertical velocity from gravity
@@ -99,6 +101,14 @@ function Car() {
     updateSteering();
     updateHeading();
     applyMovement();
+
+    // Visually rotate the front wheels to match the steering angle
+    if (frontLeftWheelRef.current) {
+      frontLeftWheelRef.current.rotation.y = -(steeringAngleRef.current * 10);
+    }
+    if (frontRightWheelRef.current) {
+      frontRightWheelRef.current.rotation.y = -(steeringAngleRef.current * 10);
+    }
   });
 
   return (
@@ -132,13 +142,13 @@ function Car() {
         </mesh>
 
         {/* Front Left */}
-        <mesh castShadow position={[0.5, -0.5, -1]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh ref={frontLeftWheelRef} castShadow position={[0.5, -0.5, -1]} rotation={[0, 0, -1.57]}>
           <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
           <meshStandardMaterial color="gray" />
         </mesh>
 
         {/* Front Right */}
-        <mesh castShadow position={[-0.5, -0.5, -1]} rotation={[0, 0, Math.PI / 2]}>
+        <mesh ref={frontRightWheelRef} castShadow position={[-0.5, -0.5, -1]} rotation={[0, 0, -1.57]}>
           <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
           <meshStandardMaterial color="gray" />
         </mesh>
