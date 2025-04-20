@@ -19,12 +19,6 @@ const useCarTuning = () => {
       min: 0.001,
       max: 2,
       step: 0.001
-    },
-    turnSpeed: {
-      value: 0.1,
-      min: 0.001,
-      max: 2,
-      step: 0.001
     }
   });
 };
