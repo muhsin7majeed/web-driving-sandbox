@@ -76,9 +76,12 @@ function Car() {
     const speed = currentSpeed.current;
     const heading = headingRef.current;
 
+    // Get current velocity to preserve y component (gravity)
+    const currentVel = rigidBody.linvel();
+    
     const velocity = {
       x: Math.sin(heading) * speed,
-      y: 0,
+      y: currentVel.y, // Preserve vertical velocity from gravity
       z: Math.cos(heading) * speed
     };
 
@@ -104,10 +107,11 @@ function Car() {
       colliders={"cuboid"}
       mass={1200}
       friction={1.2}
-      restitution={0}
-      linearDamping={0.2}
+      restitution={0.1}
+      linearDamping={0.1}
       angularDamping={4}
       enabledRotations={[false, true, false]}
+      position={[0, 3, 0]}
     >
       <group position={[0, 1.5, 0]}>
         <mesh castShadow>
