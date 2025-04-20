@@ -102,21 +102,40 @@ function Car() {
     <RigidBody
       ref={rigidBodyRef}
       colliders={"cuboid"}
-      mass={1}
-      friction={2}
-      restitution={0.1}
-      linearDamping={1.5}
-      angularDamping={1.5}
+      mass={1200}
+      friction={1.2}
+      restitution={0}
+      linearDamping={0.2}
+      angularDamping={4}
       enabledRotations={[false, true, false]}
     >
-      <group position={[0, 0.5, 0]}>
+      <group position={[0, 1.5, 0]}>
         <mesh castShadow>
           <boxGeometry args={[1, 1, 3]} />
           <meshStandardMaterial color="hotpink" />
         </mesh>
 
-        <mesh castShadow position={[0, 1, 0.5]}>
-          <boxGeometry args={[1, 1, 1]} />
+        {/* Rear Right */}
+        <mesh castShadow position={[0.5, -0.5, 1]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
+          <meshStandardMaterial color="gray" />
+        </mesh>
+
+        {/* Rear Right */}
+        <mesh castShadow position={[-0.5, -0.5, 1]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
+          <meshStandardMaterial color="gray" />
+        </mesh>
+
+        {/* Front Left */}
+        <mesh castShadow position={[0.5, -0.5, -1]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
+          <meshStandardMaterial color="gray" />
+        </mesh>
+
+        {/* Front Right */}
+        <mesh castShadow position={[-0.5, -0.5, -1]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
           <meshStandardMaterial color="gray" />
         </mesh>
       </group>
