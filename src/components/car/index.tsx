@@ -18,9 +18,9 @@ function Car() {
   const { topSpeed, acceleration, friction } = useCarTuning();
 
   const maxReverseSpeed = topSpeed * 0.5;
-  const maxSteeringAngle = Math.PI / 120;
+  const maxSteeringAngle = Math.PI / 6; // ~30 degrees
   const wheelbase = 4; // meters
-  const steeringSpeed = 0.001;
+  const steeringSpeed = 2;
 
   const updateThrottle = () => {
     const speed = currentSpeed.current;
@@ -43,14 +43,20 @@ function Car() {
     }
   };
 
-  const updateSteering = () => {
+  const updateSteering = (delta: number) => {
+    const deltaSteer = steeringSpeed * delta;
+
     if (controls.left) {
-      steeringAngleRef.current -= steeringSpeed;
+      steeringAngleRef.current -= deltaSteer;
     } else if (controls.right) {
-      steeringAngleRef.current += steeringSpeed;
+      steeringAngleRef.current += deltaSteer;
     } else {
       // Auto-centering steering (smooth return to 0)
       steeringAngleRef.current *= 0.9;
+
+      if (Math.abs(steeringAngleRef.current) < 0.001) {
+        steeringAngleRef.current = 0;
+      }
     }
 
     steeringAngleRef.current = clamp(steeringAngleRef.current, -maxSteeringAngle, maxSteeringAngle);
@@ -66,7 +72,7 @@ function Car() {
     if (Math.abs(steeringAngleRef.current) < 0.001) return;
 
     const turnRadius = wheelbase / Math.sin(steeringAngleRef.current); // Based on simple bicycle model
-    const angularVelocity = speed / turnRadius;
+    const angularVelocity = (speed * 0.05) / turnRadius;
 
     headingRef.current += angularVelocity;
   };
@@ -94,21 +100,27 @@ function Car() {
     rigidBody.setRotation(quat, true);
   };
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (!rigidBodyRef.current) return;
 
     updateThrottle();
-    updateSteering();
+    updateSteering(delta);
     updateHeading();
     applyMovement();
 
     // Visually rotate the front wheels to match the steering angle
     if (frontLeftWheelRef.current) {
-      frontLeftWheelRef.current.rotation.y = -(steeringAngleRef.current * 10);
+      frontLeftWheelRef.current.rotation.y = -steeringAngleRef.current;
     }
     if (frontRightWheelRef.current) {
-      frontRightWheelRef.current.rotation.y = -(steeringAngleRef.current * 10);
+      frontRightWheelRef.current.rotation.y = -steeringAngleRef.current;
     }
+
+    // console.log(
+    //   steeringAngleRef.current,
+    //   frontLeftWheelRef.current?.rotation.y,
+    //   frontRightWheelRef.current?.rotation.y
+    // );
   });
 
   return (
