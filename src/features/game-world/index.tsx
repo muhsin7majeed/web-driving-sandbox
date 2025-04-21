@@ -5,6 +5,7 @@ import { Physics } from "@react-three/rapier";
 import Car from "@/components/car";
 import AiCar from "@/components/AiCar";
 import Ground from "@/components/ground";
+import Obstacles from "@/components/obstacles";
 
 const GameWorld = () => {
   return (
@@ -18,6 +19,7 @@ const GameWorld = () => {
         <Car />
         <AiCar />
         <Ground />
+        <Obstacles count={30} areaSize={80} />
 
         <OrbitControls />
       </Physics>
