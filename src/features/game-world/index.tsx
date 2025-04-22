@@ -9,6 +9,9 @@ import { CameraHelper, DirectionalLight, DirectionalLightHelper } from "three";
 import { useControls } from "leva";
 import City from "@/features/city";
 import Traffic from "../traffic";
+import CarTwo from "@/components/car/CarTwo";
+
+const EARTH_GRAVITY = 9.81;
 
 const Lights = () => {
   const directionalLightRef = useRef<DirectionalLight>(null!);
@@ -46,13 +49,14 @@ const GameWorld = () => {
       <gridHelper args={[100, 100]} />
       <axesHelper args={[5]} />
 
-      <Physics gravity={[0, -9.81, 0]}>
+      <Physics gravity={[0, -EARTH_GRAVITY, 0]}>
         <mesh receiveShadow>
-          <Car />
+          {/* <Car /> */}
+          <CarTwo />
         </mesh>
 
         <Ground />
-        <City />
+        {/* <City /> */}
         {/* <Traffic /> */}
 
         {/* <Obstacles count={30} areaSize={80} /> */}
