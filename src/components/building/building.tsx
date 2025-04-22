@@ -1,11 +1,19 @@
+import { RigidBody } from "@react-three/rapier";
 import { Vector3 } from "three";
 
-const Building = ({ position }: { position: any }) => {
+interface BuildingProps {
+  position: any;
+  size: [number, number, number];
+}
+
+const Building = ({ position, size }: BuildingProps) => {
   return (
-    <mesh position={position}>
-      <boxGeometry args={[2, 10, 2]} />
-      <meshStandardMaterial color="gray" />
-    </mesh>
+    <RigidBody type="fixed" colliders="cuboid" position={position}>
+      <mesh castShadow receiveShadow>
+        <boxGeometry args={size} />
+        <meshStandardMaterial color="gray" />
+      </mesh>
+    </RigidBody>
   );
 };
 

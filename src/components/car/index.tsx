@@ -119,7 +119,7 @@ function Car() {
 
   return (
     <>
-      <Text position={[0, 3, 0]} fontSize={0.5} color="white">
+      <Text position={[0, 3, 4]} fontSize={0.5} color="white">
         {Math.abs(Math.round(currentSpeed.current))} km/h
       </Text>
 
@@ -132,7 +132,7 @@ function Car() {
         linearDamping={0.5}
         angularDamping={2}
         enabledRotations={[false, true, false]}
-        position={[0, 3, 0]}
+        position={[0, 3, 3]}
       >
         <group position={[0, 1.5, 0]}>
           {/* Car body */}

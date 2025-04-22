@@ -1,21 +1,14 @@
 import { Canvas } from "@react-three/fiber";
-import {
-  GizmoHelper,
-  GizmoViewcube,
-  GizmoViewport,
-  OrbitControls,
-  OrthographicCamera,
-  useHelper
-} from "@react-three/drei";
+import { GizmoHelper, GizmoViewport, OrbitControls, useHelper } from "@react-three/drei";
 import { Physics } from "@react-three/rapier";
 
 import Car from "@/components/car";
-import AiCar from "@/components/AiCar";
 import Ground from "@/components/ground";
-import Obstacles from "@/components/obstacles";
 import { useRef } from "react";
 import { CameraHelper, DirectionalLight, DirectionalLightHelper } from "three";
 import { useControls } from "leva";
+import City from "@/features/city";
+import Traffic from "../traffic";
 
 const Lights = () => {
   const directionalLightRef = useRef<DirectionalLight>(null!);
@@ -57,8 +50,11 @@ const GameWorld = () => {
         <mesh receiveShadow>
           <Car />
         </mesh>
-        {/* <AiCar /> */}
+
         <Ground />
+        <City />
+        {/* <Traffic /> */}
+
         {/* <Obstacles count={30} areaSize={80} /> */}
       </Physics>
     </Canvas>

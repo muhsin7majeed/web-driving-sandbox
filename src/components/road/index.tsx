@@ -1,12 +1,12 @@
-import { TextureLoader, Vector3 } from "three";
+import { Decal, useTexture } from "@react-three/drei";
 
-const Road = ({ position }: { position: any }) => {
-  const roadTexture = new TextureLoader().load("./assets/road-texture.jpg");
-
+const Road = () => {
+  const texture = useTexture("/road-texture.jpg"); // Add a road texture
   return (
-    <mesh position={position}>
-      <planeGeometry args={[10, 100]} /> {/* Adjust width and length */}
-      <meshStandardMaterial map={roadTexture} />
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+      <planeGeometry args={[100, 100]} />
+      <meshStandardMaterial color="gray" />
+      <Decal position={[0, 0, 0]} rotation={0} scale={[10, 10, 1]} map={texture} />
     </mesh>
   );
 };
