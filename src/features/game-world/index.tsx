@@ -1,27 +1,65 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import {
+  GizmoHelper,
+  GizmoViewcube,
+  GizmoViewport,
+  OrbitControls,
+  OrthographicCamera,
+  useHelper
+} from "@react-three/drei";
 import { Physics } from "@react-three/rapier";
 
 import Car from "@/components/car";
 import AiCar from "@/components/AiCar";
 import Ground from "@/components/ground";
 import Obstacles from "@/components/obstacles";
+import { useRef } from "react";
+import { CameraHelper, DirectionalLight, DirectionalLightHelper } from "three";
+import { useControls } from "leva";
+
+const Lights = () => {
+  const directionalLightRef = useRef<DirectionalLight>(null!);
+
+  useHelper(directionalLightRef, DirectionalLightHelper, 2, "white");
+  const { lightX, lightY, lightZ } = useControls({
+    lightX: { value: 10 },
+    lightY: { value: 10 },
+    lightZ: { value: 0 }
+  });
+
+  const shadow = useRef(null!);
+
+  useHelper(shadow, CameraHelper);
+
+  return (
+    <>
+      <ambientLight intensity={0.5} />
+      <directionalLight ref={directionalLightRef} position={[lightX, lightY, lightZ]} castShadow />
+    </>
+  );
+};
 
 const GameWorld = () => {
   return (
-    <Canvas shadows camera={{ position: [0, 5, 10], fov: 50 }}>
+    <Canvas shadows camera={{ position: [0, 5, 10], fov: 80 }}>
+      <OrbitControls />
+      <Lights />
+      <color attach="background" args={["skyblue"]} />
+
+      <GizmoHelper alignment={"bottom-right"}>
+        <GizmoViewport />
+      </GizmoHelper>
+
+      <gridHelper args={[100, 100]} />
+      <axesHelper args={[5]} />
+
       <Physics gravity={[0, -9.81, 0]}>
-        <color attach="background" args={["skyblue"]} />
-
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} castShadow />
-
-        <Car />
-        <AiCar />
+        <mesh receiveShadow>
+          <Car />
+        </mesh>
+        {/* <AiCar /> */}
         <Ground />
-        <Obstacles count={30} areaSize={80} />
-
-        <OrbitControls />
+        {/* <Obstacles count={30} areaSize={80} /> */}
       </Physics>
     </Canvas>
   );
