@@ -13,8 +13,6 @@ export default function useControls() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      console.log(e.key);
-
       const key = e.key === " " ? "space" : e.key.toLowerCase();
 
       setKeys((prev) => ({ ...prev, [key]: true }));

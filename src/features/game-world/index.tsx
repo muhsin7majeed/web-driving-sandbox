@@ -11,8 +11,6 @@ import City from "@/features/city";
 import Traffic from "../traffic";
 import CarTwo from "@/components/car/CarTwo";
 
-const EARTH_GRAVITY = 9.81;
-
 const Lights = () => {
   const directionalLightRef = useRef<DirectionalLight>(null!);
 
@@ -37,7 +35,7 @@ const Lights = () => {
 
 const GameWorld = () => {
   return (
-    <Canvas shadows camera={{ position: [0, 5, 10], fov: 80 }}>
+    <Canvas shadows camera={{ position: [0, 5, 10], fov: 50 }}>
       <OrbitControls />
       <Lights />
       <color attach="background" args={["skyblue"]} />
@@ -49,7 +47,7 @@ const GameWorld = () => {
       <gridHelper args={[100, 100]} />
       <axesHelper args={[5]} />
 
-      <Physics gravity={[0, -EARTH_GRAVITY, 0]}>
+      <Physics debug>
         <mesh receiveShadow>
           {/* <Car /> */}
           <CarTwo />
