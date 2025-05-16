@@ -73,11 +73,7 @@ const CarTwo = () => {
   ]);
 
   const accelerateCar = () => {
-    // rearAxleJoint.current.configureMotorVelocity(0, 10);
     rearAxleRef.current.addTorque(new Vector3(-1, 0, 0), true);
-    // frontAxleRef.current.addTorque(new Vector3(-1, 0, 0), true);
-
-    // carRigidBodyRef.current.addForce(new Vector3(0, 0, -2), true);
   };
 
   const reverseCar = () => {
@@ -92,12 +88,14 @@ const CarTwo = () => {
     if (rearAxleRef.current) {
       const rearAngVel = rearAxleRef.current.angvel();
 
+      rearAxleRef.current.addTorque(new Vector3(0, 0, 0), true);
+
       // Apply counter-torque proportional to current angular velocity
       // This creates a braking effect that will eventually stop the wheels
-      // if (rearAngVel.x !== 0) {
-      //   const brakingForce = -rearAngVel.x * 0.1; // Adjust coefficient for braking strength
-      //   rearAxleRef.current.addTorque(new Vector3(brakingForce, 0, 0), true);
-      // }
+      if (rearAngVel.x !== 0) {
+        const brakingForce = -rearAngVel.x * 0.1; // Adjust coefficient for braking strength
+        rearAxleRef.current.addTorque(new Vector3(brakingForce, 0, 0), true);
+      }
     }
   };
 
@@ -151,7 +149,7 @@ const CarTwo = () => {
         restitution={0.2}
         linearDamping={0.5}
         angularDamping={2}
-        enabledRotations={[false, true, false]}
+        // enabledRotations={[false, true, false]}
         position={[0, 2, 0]}
       >
         <group>
@@ -163,59 +161,83 @@ const CarTwo = () => {
         </group>
       </RigidBody>
 
-      <group>
-        {/* Front Left Wheel */}
-        <RigidBody ref={frontLeftWheelRef} position={[-1, 2, -3]} colliders={"trimesh"} mass={10} friction={1}>
-          <mesh castShadow rotation={[0, 0, -Math.PI / 2]}>
-            <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
-            <meshStandardMaterial color="yellow" />
-          </mesh>
-        </RigidBody>
+      {/* Front Left Wheel */}
+      <RigidBody
+        ref={frontLeftWheelRef}
+        position={[-1, 2, -3]}
+        colliders={"trimesh"}
+        mass={25}
+        friction={1}
+        enabledRotations={[true, false, false]}
+      >
+        <mesh castShadow rotation={[0, 0, -Math.PI / 2]}>
+          <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
+          <meshStandardMaterial color="yellow" />
+        </mesh>
+      </RigidBody>
 
-        {/* Front Right Wheel */}
-        <RigidBody ref={frontRightWheelRef} position={[1, 2, -3]} colliders={"trimesh"} mass={10} friction={1}>
-          <mesh castShadow rotation={[0, 0, -Math.PI / 2]}>
-            <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
-            <meshStandardMaterial color="blue" />
-          </mesh>
-        </RigidBody>
+      {/* Front Right Wheel */}
+      <RigidBody
+        ref={frontRightWheelRef}
+        position={[1, 2, -3]}
+        colliders={"trimesh"}
+        mass={25}
+        friction={1}
+        enabledRotations={[true, false, false]}
+      >
+        <mesh castShadow rotation={[0, 0, -Math.PI / 2]}>
+          <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
+          <meshStandardMaterial color="blue" />
+        </mesh>
+      </RigidBody>
 
-        {/* Front Axle */}
-        <RigidBody ref={frontAxleRef} position={[0, 2, -3]} mass={10}>
-          <mesh castShadow rotation={[0, 0, Math.PI / 2]} onClick={printPosition}>
-            <axesHelper args={[2]} />
-            <cylinderGeometry args={[0.1, 0.1, 1.3, 16]} />
-            <meshStandardMaterial color="gray" />
-          </mesh>
-        </RigidBody>
-      </group>
+      {/* Front Axle */}
+      <RigidBody ref={frontAxleRef} position={[0, 2, -3]} mass={5} enabledRotations={[true, false, false]}>
+        <mesh castShadow rotation={[0, 0, Math.PI / 2]} onClick={printPosition}>
+          <axesHelper args={[2]} />
+          <cylinderGeometry args={[0.1, 0.1, 1.3, 16]} />
+          <meshStandardMaterial color="gray" />
+        </mesh>
+      </RigidBody>
 
-      <group>
-        {/* Rear Right Wheel*/}
-        <RigidBody ref={rearRightWheelRef} position={[-1, 2, 1]} colliders={"trimesh"} mass={10} friction={1}>
-          <mesh castShadow rotation={[0, 0, Math.PI / 2]} onClick={printPosition}>
-            <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
-            <meshStandardMaterial color="yellow" />
-          </mesh>
-        </RigidBody>
+      {/* Rear Right Wheel*/}
+      <RigidBody
+        ref={rearRightWheelRef}
+        position={[-1, 2, 1]}
+        colliders={"trimesh"}
+        mass={25}
+        friction={1}
+        enabledRotations={[true, false, false]}
+      >
+        <mesh castShadow rotation={[0, 0, Math.PI / 2]} onClick={printPosition}>
+          <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
+          <meshStandardMaterial color="yellow" />
+        </mesh>
+      </RigidBody>
 
-        {/* Rear Left Wheel */}
-        <RigidBody ref={rearLeftWheelRef} position={[1, 2, 1]} colliders={"trimesh"} mass={10} friction={1}>
-          <mesh castShadow rotation={[0, 0, Math.PI / 2]} onClick={printPosition}>
-            <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
-            <meshStandardMaterial color="blue" />
-          </mesh>
-        </RigidBody>
+      {/* Rear Left Wheel */}
+      <RigidBody
+        ref={rearLeftWheelRef}
+        position={[1, 2, 1]}
+        colliders={"trimesh"}
+        mass={25}
+        friction={1}
+        enabledRotations={[true, false, false]}
+      >
+        <mesh castShadow rotation={[0, 0, Math.PI / 2]} onClick={printPosition}>
+          <cylinderGeometry args={[0.4, 0.4, 0.3, 16]} />
+          <meshStandardMaterial color="blue" />
+        </mesh>
+      </RigidBody>
 
-        {/* Rear Axle */}
-        <RigidBody ref={rearAxleRef} position={[0, 2, 1]} mass={10}>
-          <mesh castShadow rotation={[0, 0, Math.PI / 2]} onClick={printPosition}>
-            <axesHelper args={[2]} />
-            <cylinderGeometry args={[0.1, 0.1, 1.3, 16]} />
-            <meshStandardMaterial color="gray" />
-          </mesh>
-        </RigidBody>
-      </group>
+      {/* Rear Axle */}
+      <RigidBody ref={rearAxleRef} position={[0, 2, 1]} mass={5} enabledRotations={[true, false, false]}>
+        <mesh castShadow rotation={[0, 0, Math.PI / 2]} onClick={printPosition}>
+          <axesHelper args={[2]} />
+          <cylinderGeometry args={[0.1, 0.1, 1.3, 16]} />
+          <meshStandardMaterial color="gray" />
+        </mesh>
+      </RigidBody>
     </>
   );
 };

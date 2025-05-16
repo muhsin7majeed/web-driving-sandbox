@@ -10,3 +10,14 @@ const clamp = (value: number, min: number, max: number) => {
 };
 
 export default clamp;
+
+/**
+ * Converts an angle in degrees to radians
+ * @param angle - The angle in degrees
+ * @returns The angle in radians
+ */
+const angleToRadians = (angle: number) => {
+  return angle * (Math.PI / 180);
+};
+
+export { angleToRadians };
